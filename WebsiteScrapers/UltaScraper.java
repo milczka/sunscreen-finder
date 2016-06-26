@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -61,6 +63,22 @@ class UltaScraper{
 
 
         return ssType;
+    }
+
+    private int getSPF(Document webpage){
+
+        int SPF = -1;
+
+        String productName = getProductName(webpage);
+        String pattern = "spf\\s\\d+";
+        Pattern find = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = find.matcher(productName);
+
+        if(matcher.find()){
+            SPF = Integer.parseInt((matcher.group(0)).substring(4));
+        }
+
+        return SPF;
     }
 
     private Map<String, ArrayList<String> > getAllProductInfo(String originLink) throws IOException{
