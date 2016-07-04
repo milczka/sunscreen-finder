@@ -20,6 +20,39 @@ class UltaScraper{
             String linkToProduct = "http://www.ulta.com" + product.attr("href");
             allProductLinks.add(linkToProduct);
         }
+        boolean nextLink = false;
+        String nextPage = "";
+
+        Elements possibleNextPage = website.select("a[href*=/skin-care-suncare-sunscreen]");
+        for(Element link : possibleNextPage){
+            if( link.toString().indexOf("Next") != -1){
+                nextPage = "http://ulta.com/" + link.attr("href");
+                nextLink = true;
+                break;
+            }
+        }
+
+        while(nextLink){
+            nextLink = false;
+
+            Document subWebsite = Jsoup.connect(nextPage).get();
+            Elements subSunscreenLinks = subWebsite.select("p[class=prod-desc]");
+            for(Element product : subSunscreenLinks){
+                product = product.select("a").first();
+                String linkToProduct = "http://ulta.com" + product.attr("href");
+                allProductLinks.add(linkToProduct);
+            }
+
+            Elements subPossibleNextPage = subWebsite.select("a[href*=/skin-care-suncare-sunscreen]");
+            for(Element link : subPossibleNextPage){
+                if( link.toString().indexOf("Next") != -1){
+                    nextPage = "http://ulta.com/" + link.attr("href");
+                    nextLink = true;
+                    break;
+                }
+            }
+        }
+
         return allProductLinks;
     }
 
@@ -94,6 +127,7 @@ class UltaScraper{
             String productName = getProductName(productPage);
             System.out.println(productName);
             System.out.println(allIngredients);
+            System.out.println( getSPF(productPage) );
 
             productInfo.put(productName, supplementInfo);
         }
