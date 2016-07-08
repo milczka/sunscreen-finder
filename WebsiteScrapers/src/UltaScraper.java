@@ -25,7 +25,7 @@ class UltaScraper{
 
         Elements possibleNextPage = website.select("a[href*=/skin-care-suncare-sunscreen]");
         for(Element link : possibleNextPage){
-            if( link.toString().contains("Next")){
+            if( link.toString().indexOf("Next") != -1){
                 nextPage = "http://ulta.com/" + link.attr("href");
                 nextLink = true;
                 break;
@@ -45,7 +45,7 @@ class UltaScraper{
 
             Elements subPossibleNextPage = subWebsite.select("a[href*=/skin-care-suncare-sunscreen]");
             for(Element link : subPossibleNextPage){
-                if( link.toString().contains("Next")){
+                if( link.toString().indexOf("Next") != -1){
                     nextPage = "http://ulta.com/" + link.attr("href");
                     nextLink = true;
                     break;
@@ -56,17 +56,17 @@ class UltaScraper{
         return allProductLinks;
     }
 
-    private String getIngredients(Document productPage){
+    private String getIngredients(Document webpage){
 
-        Element ingredients = productPage.select("div[id=product-default-ingredients]").get(0).select("div").first();
+        Element ingredients = webpage.select("div[id=product-default-ingredients]").get(0).select("div").first();
         String allIngredients = ingredients.text();
 
         return allIngredients;
     }
 
-    private String getProductName(Document productPage){
+    private String getProductName(Document webpage){
 
-        Element htmlTitle = productPage.select("meta[property=og:title]").first();
+        Element htmlTitle = webpage.select("meta[property=og:title]").first();
         String productName = htmlTitle.attr("content");
 
         return productName;
@@ -98,11 +98,11 @@ class UltaScraper{
         return ssType;
     }
 
-    private int getSPF(Document productPage){
+    private int getSPF(Document webpage){
 
         int SPF = -1;
 
-        String productName = getProductName(productPage);
+        String productName = getProductName(webpage);
         String pattern = "spf\\s\\d+";
         Pattern find = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
         Matcher matcher = find.matcher(productName);
@@ -125,7 +125,9 @@ class UltaScraper{
             Document productPage = Jsoup.connect(link).get();
             String allIngredients = getIngredients(productPage);
             String productName = getProductName(productPage);
-            supplementInfo.add(allIngredients);
+            System.out.println(productName);
+            System.out.println(allIngredients);
+            System.out.println( getSPF(productPage) );
 
             productInfo.put(productName, supplementInfo);
         }
@@ -149,9 +151,6 @@ class UltaScraper{
 
         UltaScraper testScrape = new UltaScraper();
 
-        Map<String, ArrayList<String> > productInfo = testScrape.getAllProductInfo("http://ulta.com/skin-care-suncare-sunscreen?N=27ff");
-
-        System.out.println(productInfo.toString());
-
+        testScrape.getAllProductInfo("http://ulta.com/skin-care-suncare-sunscreen?N=27ff");
     }
 }
