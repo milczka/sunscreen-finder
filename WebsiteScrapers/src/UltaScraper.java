@@ -72,6 +72,14 @@ class UltaScraper{
         return productName;
     }
 
+    private String getProductBrand(Document webpage){
+
+        Element htmlBrand = webpage.select("meta[property=og:brand]").first();
+        String productBrand = htmlBrand.attr("content");
+
+        return productBrand;
+    }
+
     private String determineSSType(String ingredients){
         // returns: physical, chemical, or combo
 
@@ -94,7 +102,6 @@ class UltaScraper{
         else if(physical) ssType = "physical";
         else if(chemical) ssType = "chemical";
 
-
         return ssType;
     }
 
@@ -114,6 +121,13 @@ class UltaScraper{
         return SPF;
     }
 
+    int determineStability(String ingredients){
+
+        int stable = 0;
+
+        return stable;
+    }
+
     private Map<String, ArrayList<String> > getAllProductInfo(String originLink) throws IOException{
 
         Map<String, ArrayList<String> > productInfo = new HashMap<>();
@@ -123,11 +137,10 @@ class UltaScraper{
         for(String link : allLinks){
             supplementInfo.clear();
             Document productPage = Jsoup.connect(link).get();
-            String allIngredients = getIngredients(productPage);
             String productName = getProductName(productPage);
-            System.out.println(productName);
-            System.out.println(allIngredients);
-            System.out.println( getSPF(productPage) );
+            String productBrand = getProductBrand(productPage);
+            String allIngredients = getIngredients(productPage);
+            int spf = getSPF(productPage);
 
             productInfo.put(productName, supplementInfo);
         }
@@ -143,6 +156,23 @@ class UltaScraper{
         String allIngredients = getIngredients(productPage);
         String productName = getProductName(productPage);
         productInfo.put(productName, supplementInfo);
+
+        return productInfo;
+    }
+
+    private Map<String, String> getProductInfo(String originLink) throws IOException{
+
+        Map<String, String> productInfo = new HashMap<>();
+
+        Document productPage = Jsoup.connect(originLink).get();
+        productInfo.put("link", originLink);
+        productInfo.put("name", getProductBrand(productPage));
+        productInfo.put("brand", getProductBrand(productPage));
+        productInfo.put("ingredients", getIngredients(productPage));
+        productInfo.put("spf", getIngredients(productPage));
+        productInfo.put("ss_type", determineSSType(getIngredients(productPage)));
+        String stable = String.valueOf(determineStability(getIngredients(productPage)));
+        productInfo.put("stable", stable);
 
         return productInfo;
     }
