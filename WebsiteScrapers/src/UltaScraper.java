@@ -170,6 +170,11 @@ class UltaScraper{
         productInfo.put("brand", getProductBrand(productPage));
         productInfo.put("ingredients", getIngredients(productPage));
         productInfo.put("spf", getIngredients(productPage));
+        String ssType = determineSSType(getIngredients(productPage));
+        String chemical = "0";
+        String physical = "0";
+        if(ssType.equals("chemical")) chemical = "1";
+        if(ssType.equals("physical")) physical = "1";
         productInfo.put("ss_type", determineSSType(getIngredients(productPage)));
         String stable = String.valueOf(determineStability(getIngredients(productPage)));
         productInfo.put("stable", stable);
